@@ -8,8 +8,19 @@ public class Drift : MonoBehaviour
     [SerializeField] float maxSpeed = 10f;      //ÃÖ´ë ¼Óµµ Á¦ÇÑ
     [SerializeField] float driftFactor = 0.95f; //³·À»¼ö·Ï ´õ ¹Ì²ô·¯Áü
 
+    [SerializeField] float slowAccelerationRatio = 0.5f;
+    [SerializeField] float boostAccelerationRatio = 1.5f;
+    [SerializeField] float speedTime = 3f;
+
+    float acceleration;
+    float defaultAcceleration;
+    float slowAcceleration;
+    float boostAcceleration;
+
     [SerializeField] ParticleSystem smokeLeft;
     [SerializeField] ParticleSystem smokeRight;
+    [SerializeField] TrailRenderer rightTrail;
+    [SerializeField] TrailRenderer leftTrail;
 
     Rigidbody2D rb;
     AudioSource audioSource;
@@ -18,6 +29,10 @@ public class Drift : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         audioSource = rb.GetComponent<AudioSource>();
+
+        defaultAcceleration = acceleration;
+        slowAcceleration = acceleration * slowAccelerationRatio;
+        boostAcceleration = acceleration * boostAccelerationRatio;
     }
 
     void FixedUpdate()
@@ -55,7 +70,29 @@ public class Drift : MonoBehaviour
             if (smokeRight.isPlaying) smokeRight.Stop();
         }
 
+        leftTrail.emitting = isDrifting;
+        rightTrail.emitting = isDrifting;
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Boost"))
+        {
+            acceleration = boostAcceleration;
+            Debug.Log("Boost!!!!!!!!!!!!!!");
 
+            Invoke("ResetAcceleration", speedTime);
+        }
+    }
+    void ResetAcceleration()
+    {
+        acceleration = defaultAcceleration;
+    }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        acceleration = slowAcceleration;
+        Debug.Log("Slow !!!!!!!!!!!!!!");
+
+        Invoke("ResetAcceleration", speedTime);
     }
 }

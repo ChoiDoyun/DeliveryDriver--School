@@ -6,28 +6,32 @@ public class Driver : MonoBehaviour
 {
     [SerializeField] float turnSpeed = 1f;
     [SerializeField] float moveSpeed = 0.02f;
-    [SerializeField] float slowSpeedRatio = 0.5f;
-    [SerializeField] float boostSpeedRatio = 1.5f;
-    float slowSpeed;
-    float boostSpeed;
+    [SerializeField] float slowSpeed= 0.5f;
+    [SerializeField] float boostSpeed = 1.5f;
+    [SerializeField] float speedTime = 3f;
+
+    float defaultAcceleration;
+    float slowAcceleration;
+    float boostAcceleration;
 
     void Start()
     {
-        slowSpeed = moveSpeed * slowSpeedRatio;
-        boostSpeed = moveSpeed * boostSpeedRatio;
+        slowAcceleration = moveSpeed * slowAcceleration;
+        boostAcceleration = moveSpeed * boostSpeed;
     }
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Boost"))
         {
-            moveSpeed = boostSpeed;
+            moveSpeed = boostAcceleration;
             Debug.Log("Boost!!!!!!!!!!!!!!");
+
+            Invoke("ResetAcceleration", speedTime);
         }
     }
-
     void OnCollisionEnter2D(Collision2D collision)
     {
-        moveSpeed = slowSpeed;
+        moveSpeed = slowAcceleration;
     }
 
     private int ApplyDamage(int c, int d)
